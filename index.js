@@ -1,7 +1,11 @@
+require("dotenv").config();
 const express = require("express");
 
-const { generatePodcast } = require("./utils")
+const {
+    generatePodcast
+} = require("./utils")
 const app = express();
+const twilio = require("./twilio-integration/twilio")
 
 app.use(express.json())
 app.use(express.urlencoded({
@@ -14,27 +18,43 @@ app.listen(PORT, () => {
     console.log(`Listening on port: ${PORT}`)
 })
 
-app.post("/podcast", async (req, res) => {
+app.use("/twilio", twilio)
+
+app.post("/podcasts/generate", async (req, res) => {
     try {
         const topic = req.body.topic;
-        const actors = req.body.actors;
+        const characters = req.body.characters;
+        const q = req.query.q;
+        const history = req.body.history;
+        const user = req.body.user;
 
         console.log(`Topic: ${topic} `)
-        console.log(`Actors: ${JSON.stringify(actors)}`)
-        if (!topic || !actors.length === 2) {
-            res.status(400).json({
+        console.log(`Characters: ${JSON.stringify(characters)}`)
+
+        if (!topic || !characters || characters.length !== 2) {
+            return res.status(400).json({
                 success: false,
                 error: "Required parameters not provided"
-            })
-        } else {
-            const script = await generatePodcast(topic, actors);
-
-            res.status(200).send(script)
+            });
         }
-    } catch (err) {
-        res.status(500).send({
-            success: false,
-            error: err.message
-        })
-    }
+
+        if (q && (!history || history.length === 0)) {
+            return res.status(400).json({
+                success: false,
+                error: "Required parameters not provided"
+            });
+        }
+
+        const script = await generatePodcast(topic, characters, {
+            q,
+            history
+        }, user);
+
+        res.status(200).send(script);
+} catch (err) {
+    res.status(500).send({
+        success: false,
+        error: err.message
+    })
+}
 });

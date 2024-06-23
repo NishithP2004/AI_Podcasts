@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Transcript</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playwrite+NG+Modern:wght@100..400&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            padding: 0px;
+            margin: 0px;
+            border: 0;
+        
+        }
+        
+        main {
+            font-family: "Playwrite NG Modern", cursive;
+            padding: 10px;
+        }
+
+        .row {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .transcript {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 10px;
+        }
+
+        .thumbnail {
+            width: 250px;
+            border-radius: 10px;
+        }
+
+        .transcript-body {
+            list-style-type: none;
+        }
+
+        .transcript-body li {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <main>
+        <div class="transcript">
+            <div class="row">
+                <img src="<%= podcast.thumbnail.url %>" alt="podcast-thumbnail" class="thumbnail">
+                <div class="col">
+                    <h2 class="podcast-title">
+                        <%= podcast.title %>
+                    </h2>
+                    <span class="characters"><%= podcast.characters[0].name %> &middot;
+                        <%= podcast.characters[1].name %></span>
+                </div>
+            </div>
+            <ul class="transcript-body">
+                <% podcast.script.forEach(dialog => { %>
+                <% if(dialog.actor != 3) { %>
+                <li><b><u><%= podcast.characters[parseInt(dialog.actor) - 1].name %></u></b>: <%= dialog.dialog %></li>
+                <% } else { %>
+                <li><b><u><%= podcast.user.name %></u></b>: <%= dialog.dialog %></li>
+                <% } %>
+                <% }) %>
+            </ul>
+        </div>
+    </main>
+</body>
+
+</html>
