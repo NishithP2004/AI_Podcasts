@@ -158,12 +158,6 @@ async function generatePodcast(topic, actors, followUp, user) {
 
         for (let dialog of script.script) {
             try {
-                /* if (dialog.actor == "0") {
-                    console.log(`Generating Image: ${dialog.prompt}`)
-                    dialog.url = (await generateImage(dialog.prompt)).data[0].url;
-                    console.log(`Image Generated: ${dialog.url}`)
-                } */
-
                 if (dialog.actor == "1" || dialog.actor == "2") {
                     console.log(`Generating Audio: ${dialog.dialog}`);
                     const audioFile = await synthesizeSpeech(dialog.dialog, actors[parseInt(dialog.actor) - 1].voice)
@@ -189,7 +183,7 @@ async function generatePodcast(topic, actors, followUp, user) {
     }
 }
 
-async function savePodcast(podcast, user) {
+async function savePodcast(podcast) {
     const client = new MongoClient(process.env.MONGO_CONNECTION_URL);
     const namespace = process.env.MONGO_NAMESPACE;
     const [dbName, ] = namespace.split(".");

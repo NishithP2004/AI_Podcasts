@@ -2,5 +2,17 @@
     "appService.zipIgnorePattern": [
         "node_modules{,/**}",
         ".vscode{,/**}"
+    ],
+    "containerApps.deploymentConfigurations": [
+        {
+            "label": "projectx-podcasts",
+            "type": "AcrDockerBuildRequest",
+            "dockerfilePath": "Dockerfile",
+            "srcPath": ".",
+            "envPath": ".env",
+            "resourceGroup": "projectx-frontend",
+            "containerApp": "projectx-podcasts",
+            "containerRegistry": "projectxfrontendf1d7ef"
+        }
     ]
 }

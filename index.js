@@ -20,6 +20,12 @@ app.listen(PORT, () => {
 
 app.use("/twilio", twilio)
 
+app.get("/", (req, res) => {
+    res.send({
+        message: "Hello World"
+    })
+})
+
 app.post("/podcasts/generate", async (req, res) => {
     try {
         const topic = req.body.topic;
@@ -47,14 +53,17 @@ app.post("/podcasts/generate", async (req, res) => {
 
         const script = await generatePodcast(topic, characters, {
             q,
-            history
+            history: history?.map(s => {
+                delete s.audio;
+                return s;
+            })
         }, user);
 
         res.status(200).send(script);
-} catch (err) {
-    res.status(500).send({
-        success: false,
-        error: err.message
-    })
-}
+    } catch (err) {
+        res.status(500).send({
+            success: false,
+            error: err.message
+        })
+    }
 });

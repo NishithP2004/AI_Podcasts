@@ -118,10 +118,7 @@ app.post("/podcast", async (req, res) => {
         podcast = await redis.json.get(`podcast:user:${ph}`);
         let index = parseInt(req.query.index);
         podcast.history = [
-            ...podcast.script.slice(0, index + 1).map(s => {
-                delete s.audio;
-                return s
-            }),
+            ...podcast.script.slice(0, index + 1),
             {
                 "actor": "3", // 3 signifies the user
                 "dialog": input
@@ -131,10 +128,7 @@ app.post("/podcast", async (req, res) => {
 
         const generated = await generatePodcast(podcast.title, podcast.characters, {
             q: input,
-            history: podcast.script.slice(0, index + 1).map(s => {
-                delete s.audio;
-                return s
-            })
+            history: podcast.script.slice(0, index + 1)
         }, podcast.user)
 
         podcast.script = generated.script;

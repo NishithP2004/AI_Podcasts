@@ -67,7 +67,9 @@ async function retrieveSimilarDocs(query, user, course) {
 }
 
 function serializeDocs(docs) {
-    return formatDocumentsAsString(docs)
+    return (docs && docs.length > 0) ? docs.map(doc => {
+        return doc.content
+    }).join("\n") : "";
 }
 
 module.exports = {
