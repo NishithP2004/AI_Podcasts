@@ -170,7 +170,7 @@ app.post("/status", async (req, res) => {
 
         if (status === "completed") {
             let podcast = await redis.json.get(`podcast:user:${ph}`);
-            let transcript = convertScriptToTranscript(podcast.history, podcast.characters, podcast.user)
+            let transcript = convertScriptToTranscript((podcast.history.length > 0 && podcast.script.length == 0)? podcast.history : podcast.script, podcast.characters, podcast.user)
             let summary = await generateSummary(transcript);
             console.log("Summary: " + summary)
             let transcriptUrl = await convertToPdf(podcast)
@@ -183,8 +183,14 @@ app.post("/status", async (req, res) => {
                     to: `whatsapp:${ph}`
                 })
                 .then(message => console.log(message.sid))
+            
+            if(podcast.history.length > 0 && podcast.script.length == 0)
+                podcast.script = podcast.history;
+            else if (podcast.history.length > 0 && podcast.script.length > 0) {
+                podcast.history.push(...podcast.script);
+                podcast.script = podcast.history;
+            }
 
-            podcast.script = podcast.history;
             delete podcast.history;
             delete podcast.user;
             await savePodcast(podcast)
@@ -231,7 +237,7 @@ function convertScriptToTranscript(script, actors, user) {
 
     for (let dialog of script) {
         if (dialog.id != 3) {
-            let index = actors.find((actor) => actor.id == dialog.actor);
+            let index = parseInt(dialog.actor) - 1;
             transcript += `${actors[index].name}: ${dialog.dialog}\n\n`
         } else {
             transcript += `${user.name}: ${dialog.dialog}\n\n`
@@ -276,7 +282,8 @@ async function convertToPdf(podcast) {
     });
 
     const browser = await puppeteer.launch({
-        headless: "new"
+        headless: "new",
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
     const page = await browser.newPage();
     await page.setContent(html, {
